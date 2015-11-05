@@ -8,8 +8,8 @@ Product for Computer graphic and theory of games lecture in Faculty of computer 
 Athors:
 
 Programmers:
-  - Jernej Koželj
-  - Metod Ribič
+ &nbsp;&nbsp;- Jernej Koželj
+ &nbsp;&nbsp;- Metod Ribič
 Designers:
-  - Rok Kompare
-  - Barbara Naglič
+ &nbsp;&nbsp;- Rok Kompare
+ &nbsp;&nbsp;- Barbara Naglič
