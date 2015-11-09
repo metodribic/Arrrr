@@ -40,6 +40,7 @@
 
 				//var texture = THREE.TextureLoader( 'textures/crate.gif' );
 				for ( var i = 0; i < geometry.faces.length; i += 2 ) {
+
 					var hex = Math.random() * 0xffffff;
 					geometry.faces[ i ].color.setHex( hex );
 					geometry.faces[ i + 1 ].color.setHex( hex );
