@@ -1,0 +1,30 @@
+body {
+	color: #61443e;
+	font-family:Monospace;
+	font-size:13px;
+	text-align:center;
+
+	background-color: #bfd1e5;
+	margin: 0px;
+	overflow: hidden;
+}
+
+#info {
+	position: absolute;
+	top: 0px; width: 100%;
+	padding: 5px;
+}
+
+a {
+	color: #a06851;
+}
+
+.start-screen{
+  position: fixed; 
+  background-color: black;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding:0;
+  opacity: .75;
+}
