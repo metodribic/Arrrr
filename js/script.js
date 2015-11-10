@@ -210,34 +210,38 @@ function animate() {
 }
 
 function render() {
+	console.log(started);
 	var delta = clock.getDelta();
 	var moveDistance = 20 * delta;
 	var rotateAngle = Math.PI / 2 * delta;
+
+	// če je igra v teku, povečaj hitrost oziroma se premakni za večji vektor
 	if(started)
 		cube.translateZ(-moveDistance*clock.elapsedTime*15);
 
 	if(keyboard.pressed("left")) {
+		// start
 		if(!started) 
 			startClock();
+		// rotacija v levo
 		else
 	    	cube.rotateOnAxis( new THREE.Vector3( 0, 1, 0 ), rotateAngle);
 	} 
+
 	if(keyboard.pressed("right")) { 
+		// start
 		if(!started) 
 			startClock();
+		// rotacija v desno
 		else
 			cube.rotateOnAxis( new THREE.Vector3( 0, 1, 0 ), -rotateAngle);
-	} 
-	if(keyboard.pressed("up")) {
-		//space pritisnemo ko se igra še ne izvaja - zaženemo igro - NE DELUJE 
-		if(!started)
-			startClock();
-		// space pritisnemo ko se igra že izvaja - igro ustavimo, ter ponovno izrišemo > resetiramo položaj
-		else{
-			init();
-			started = false;
-			score = 0;
-		}
+	}
+
+	// space pritisnemo ko se igra že izvaja - igro ustavimo, ter ponovno izrišemo > resetiramo položaj
+	if(keyboard.pressed("space") && started) {
+		init();
+		started = false;
+		score = 0;
 	} 
 		
 
