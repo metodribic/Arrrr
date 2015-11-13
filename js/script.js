@@ -40,7 +40,7 @@ function init() {
 	camera.position.set(0, 25, 150); 
 	scene.add(camera);
 
-	var geometry = new THREE.PlaneBufferGeometry( 3000, 30000, worldWidth - 1, worldDepth - 1 );
+	var geometry = new THREE.PlaneBufferGeometry( 2000, 50000, worldWidth - 1, worldDepth - 1 );
 	geometry.rotateX( - Math.PI / 2 );
 
 	var vertices = geometry.attributes.position.array;
@@ -55,9 +55,9 @@ function init() {
 	waterTexture.wrapS = waterTexture.wrapT = THREE.RepeatWrapping; 
 	waterTexture.repeat.set( 5, 5 );
 	var waterMaterial = new THREE.MeshBasicMaterial( { map: waterTexture, side: THREE.DoubleSide } );
-	var waterGeometry = new THREE.PlaneGeometry(3000, 30000);
+	var waterGeometry = new THREE.PlaneGeometry(3000, 50000);
 	var water = new THREE.Mesh(waterGeometry, waterMaterial);
-	water.position.y = 300;
+	water.position.y = 360;
 	water.rotation.x = Math.PI / 2;
 	water.doubleSided = true;
 	scene.add(water);
@@ -67,8 +67,8 @@ function init() {
 	var materialCube = new THREE.MeshBasicMaterial({color: 0xfffff});
 	cube = new Physijs.BoxMesh(geometryCube, materialCube);
 	cube.position.y = water.position.y + Math.round(cube.geometry.parameters.height/2);	//voda je na 250 torej more bit objekt na 250+polovica višine objekta
-	cube.position.x = -50;
-	cube.position.z = 3600;
+	cube.position.x = 250;
+	cube.position.z = 24800;
 	cube.add(camera);
 
 	cube.addEventListener( 'collision', function( other_object, relative_velocity, relative_rotation, contact_normal ) {
@@ -228,8 +228,8 @@ function render() {
 
 	// če je igra v teku, povečaj hitrost oziroma se premakni za večji vektor
 	if(started){
-		if(objSpeed < -22)
-			objSpeed = -22;
+		if(objSpeed < -23)
+			objSpeed = -23;
 		cube.translateZ(objSpeed);
 	}
 
