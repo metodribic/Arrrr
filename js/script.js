@@ -14,7 +14,7 @@ var mesh, texture, cube, coin, coin2, score, object, objectTmp;
 var worldWidth = 512, worldDepth = 512,
 worldHalfWidth = worldWidth / 2, worldHalfDepth = worldDepth / 2
 var clock = new THREE.Clock();
-var collidableMeshList = []; //tabela v katero shranis vse objekte, za collision
+var allCrates = []; //tabela v katero shranis vse objekte, za collision
 var allCoins = []; //tabela kovanckov
 var started = false;
 var score = 0;
@@ -30,16 +30,16 @@ function init() {
  
         //camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
         camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 110000 );
-        scene = new Physijs.Scene();
-        scene.addEventListener(
-                        'update',
-                        function() {
-                                console.log("bam");
-                                scene.simulate( undefined, 1 );
-                                physics_stats.update();
+        scene = new THREE.Scene();
+        // scene.addEventListener(
+        //                 'update',
+        //                 function() {
+        //                         console.log("bam");
+        //                         scene.simulate( undefined, 1 );
+        //                         physics_stats.update();
                                
-                        }
-                );
+        //                 }
+        //         );
         data = generateHeight( worldWidth, worldDepth );
  
         //camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
@@ -78,7 +78,6 @@ function init() {
         });
  
         var skyGeometry = new THREE.CubeGeometry( 100000, 100000, 100000 );    
-       
         var materialArray = [];
         for (var i = 0; i < 6; i++)
                 materialArray.push( new THREE.MeshBasicMaterial({
@@ -109,7 +108,8 @@ function init() {
                 function ( objectTmp) {
                         objectTmp.scale.x = objectTmp.scale.y = objectTmp.scale.z = 1.5;
                         objectTmp.rotateOnAxis( new THREE.Vector3( 0, 1, 0 ), -Math.PI / 2);
-                        objectTmp.position.y = water.position.y + Math.round(cube.geometry.parameters.height/2);        //voda je na 250 torej more bit objekt na 250+polovica višine objekta
+                        //voda je na 250 torej more bit objekt na 250+polovica višine objekta
+                        objectTmp.position.y = water.position.y + Math.round(cube.geometry.parameters.height/2);        
                         objectTmp.position.x = 250;
                         objectTmp.position.z = 24800;
                        
@@ -120,11 +120,12 @@ function init() {
                 } );
         */
                
-        //LADJA-KOCKA  
+        //############ LADJA-KOCKA ############
         var geometryCube = new THREE.BoxGeometry(25, 25, 25);
         var materialCube = new THREE.MeshBasicMaterial({color: 0xfffff});
-        cube = new Physijs.BoxMesh(geometryCube, materialCube);
-        cube.position.y = water.position.y + Math.round(cube.geometry.parameters.height/2);     //voda je na 250 torej more bit objekt na 250+polovica višine objekta
+        cube = new THREE.Mesh(geometryCube, materialCube);
+        //voda je na 250 torej more bit objekt na 250+polovica višine objekta
+        cube.position.y = water.position.y + Math.round(cube.geometry.parameters.height/2);     
         cube.position.x = 250;
         cube.position.z = 24800;
         cube.add(camera);
@@ -172,20 +173,14 @@ function init() {
  
         
         //############ ZETONI ############
-        //random generiranje zetonov
-
         for (var i=0; i<=100; i++) {
-                randomX = Math.floor(Math.random() * 500)-200;
-                randomY = Math.floor(Math.random() * 45000)-16000;  
-                console.log(randomX,randomY);
-               	createCoin(randomX, randomY);
+            randomX = Math.floor(Math.random() * 500)-200;
+            randomY = Math.floor(Math.random() * 45000)-16000;  
+           	createCoin(randomX, randomY);
         }      
-                    
-        //coin2 = createCoin(300, 24600);
-        //coin3 = createCoin(250, 20200);
        
        
-        //zeton test
+        //############ 	PRVI ŽETON ############
         var geometryCoin = new THREE.CylinderGeometry( 8, 8, 2, 32 );
         var materialCoin = new THREE.MeshBasicMaterial( {color: 0xffff00} );
         coin = new THREE.Mesh( geometryCoin, materialCoin );
@@ -195,18 +190,19 @@ function init() {
         coin.position.z = 24250;
         allCoins.push(coin);
         scene.add( coin );
-        console.log(allCoins);
+        //console.log(allCoins);
        
  
 /*      //############ TESTNI OBJEKT############
         var geometryCube = new THREE.BoxGeometry(25, 25, 25);
         var materialCube = new THREE.MeshBasicMaterial({color: 0x343434});
         cube1 = new Physijs.BoxMesh(geometryCube, materialCube);
-        cube1.position.y = water.position.y + Math.round(cube.geometry.parameters.height/2);    //voda je na 250 torej more bit objekt na 250+polovica višine objekta
+        //voda je na 250 torej more bit objekt na 250+polovica višine objekta
+        cube1.position.y = water.position.y + Math.round(cube.geometry.parameters.height/2);    
         cube1.position.x = -50;
         cube1.position.z = 3500;
         scene.add(cube1);
-        collidableMeshList.push(cube1);
+        allCrates.push(cube1);
 */
  
         //############ TEREN ############
@@ -215,39 +211,39 @@ function init() {
         texture.wrapT = THREE.ClampToEdgeWrapping;
         mesh = new Physijs.BoxMesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
         scene.add( mesh );
-        //collidableMeshList.push(mesh);
+        //allCrates.push(mesh);
  
+
         //############ RENDERER ############
         renderer = new THREE.WebGLRenderer();
         //renderer.setClearColor( 0x99ffcc );
         //renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, window.innerHeight );
- 
         container.innerHTML = "";
         container.appendChild( renderer.domElement );
  
+
         //############ STATS ############
         stats = new Stats();
         stats.domElement.style.position = 'absolute';
         stats.domElement.style.top = '0px';
         container.appendChild( stats.domElement );
  
+
         ///############ SCORE ############ - NOT WORKING
         divScore = document.createElement("div");
         divScore.style.width = "100px";
         divScore.style.height = "100px";
         divScore.style.color = "red";
-        //divScore.style.position = "fixed";
 	    divScore.style.top = "100%" ;
 	    divScore.style.right = "100%" ;
 	    divScore.style.zIndex = "99";
         divScore.textContent = score;
         container.appendChild(divScore);
  
- 
         window.addEventListener( 'resize', onWindowResize, false );
  
-}
+} // end of init()
  
  
 // kreiranje zakladov-ZETONOV //
@@ -273,16 +269,17 @@ function createObstacle(ox, oz) {
         var crateMaterial = new THREE.MeshBasicMaterial( { map: crateTexture } );
         var crateGeometry = new THREE.CubeGeometry(25, 25, 25, 1, 1, 1);
         crate = new THREE.Mesh(crateGeometry, crateMaterial);
-        crate.position.y = water.position.y + Math.round(cube.geometry.parameters.height/2);    //voda je na 250 torej more bit objekt na 250+polovica višine objekta
+        //voda je na 250 torej more bit objekt na 250+polovica višine objekta
+        crate.position.y = water.position.y + Math.round(cube.geometry.parameters.height/2);    
         crate.position.x = ox;
         crate.position.z = oz;
-        collidableMeshList.push(crate);
+        allCrates.push(crate);
         scene.add( crate );
         return crate;
 }
  
  
- 
+// resize handler
 function onWindowResize() {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
@@ -290,7 +287,8 @@ function onWindowResize() {
         //controls.handleResize();
 }
  
- 
+
+// generiranje terena
 function generateHeight( width, height ) {
         var size = width * height, data = new Uint8Array( size ),
         perlin = new ImprovedNoise(), quality = 1, z = 100;
@@ -305,6 +303,7 @@ function generateHeight( width, height ) {
 }
  
  
+// generiranje texture za teren
 function generateTexture( data, width, height ) {
  
         var canvas, canvasScaled, context, image, imageData,
@@ -363,12 +362,12 @@ function generateTexture( data, width, height ) {
         context.putImageData( image, 0, 0 );
  
         return canvasScaled;
- 
 }
  
  
+
 function animate() {
-        scene.simulate();
+        // scene.simulate();
         render();
         requestAnimationFrame( animate );
         stats.update();
@@ -381,16 +380,9 @@ function render() {
         var moveDistance = 20 * delta;
         var rotateAngle = Math.PI / 6 * delta;
         var objSpeed = -moveDistance*clock.elapsedTime*15;
-        coin.rotation.x += 0.1;
-        coin.rotation.z += 0.13;
- 
-       
-       
- 
-        //coin2.rotation.x += 0.1;
-        //coin2.rotation.z += 0.13;
-        //coin3.rotation.x += 0.1;
-        //coin3.rotation.z += 0.13;
+
+        rotateCoins();
+
  
         // če je igra v teku, povečaj hitrost oziroma se premakni za večji vektor
         if(started){
@@ -436,35 +428,30 @@ function render() {
         //   HOWEVER: when the origin of the ray is within the target mesh, collisions do not occur
         var originPoint = cube.position.clone();
  
- 
-       
         for (var vertexIndex = 0; vertexIndex < cube.geometry.vertices.length; vertexIndex++){		
 			var localVertex = cube.geometry.vertices[vertexIndex].clone();
 			var globalVertex = localVertex.applyMatrix4( cube.matrix );
 			var directionVector = globalVertex.sub( cube.position );
 			
 			var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
-			var collisionResultsCrate = ray.intersectObjects( collidableMeshList );
+			var collisionResultsCrate = ray.intersectObjects( allCrates );
 			var ray2 = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
 			var collisionResultsCoins = ray2.intersectObjects( allCoins );
-			//var collisionTeren = ray.intersectObjects(mesh);
-			/*if(collisionTeren.distance < directionVector.length()){
-				//zadetek v teren
-				console.log("TEREN");
-			}*/
+
 
 			// zadanem škatlo
 			if ( collisionResultsCrate.length > 0 && collisionResultsCrate[0].distance < directionVector.length() ) {
-				console.log(" ZABOJ ");
-				score++;
-				console.log(" SCORE:  "+score);
+				console.log(" ZABOJ ###");
+				score--;
+
+				//console.log(" SCORE:  "+score);
 			}
 
 			// zadanem žeton
 			if ( collisionResultsCoins.length > 0 && collisionResultsCoins[0].distance < directionVector.length() ) {
-				console.log("kovanc")
+				console.log("kovanc ++++++++++++++")
 				score++;
-				console.log(" SCORE:  "+score);
+				//console.log(" SCORE:  "+score);
 			}	
 		}      
        
@@ -478,4 +465,12 @@ function render() {
 function startClock(){
         started = true;
         clock = new THREE.Clock();
+}
+
+
+function rotateCoins(){
+	for (coin1 of allCoins){
+		coin1.rotation.x += 0.1;
+        coin1.rotation.z += 0.13;
+	}
 }
