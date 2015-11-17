@@ -31,7 +31,18 @@ var first;
 
 init();
 animate();
- 
+
+
+//############ GLASBA ############
+var loopMusic = new Audio('sounds/loop.wav');
+loopMusic.loop = true;
+loopMusic.play();
+
+var ship = new Audio('sounds/naSidru.wav');
+ship.loop = true;
+ship.play();
+
+
  
 function init() {
         container = document.getElementById( 'container' );
@@ -45,7 +56,8 @@ function init() {
         data = generateHeight( worldWidth, worldDepth );
  
         //camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
-        camera.position.set(0, 25, 150);
+        // camera.position.set(0, 25, 150);
+        camera.position.set(15, 4, 0);
         scene.add(camera);
  
         var geometry = new THREE.PlaneBufferGeometry( 2000, 50000, worldWidth - 1, worldDepth - 1 );
@@ -59,12 +71,12 @@ function init() {
        
         //############ NEBO ############
         var urls = [
-                'textures/yellowcloud_rt.jpg',
-                'textures/yellowcloud_lf.jpg',
-                'textures/yellowcloud_up.jpg',         
-                'textures/yellowcloud_dn.jpg',
-                'textures/yellowcloud_bk.jpg',         
-                'textures/yellowcloud_ft.jpg'
+                'textures/sky/graycloud_rt.jpg',
+                'textures/sky/graycloud_lf.jpg',
+                'textures/sky/graycloud_up.jpg',         
+                'textures/sky/graycloud_dn.jpg',
+                'textures/sky/graycloud_bk.jpg',         
+                'textures/sky/graycloud_ft.jpg'
         ];
  
         textureCube = THREE.ImageUtils.loadTextureCube(urls);
@@ -121,18 +133,44 @@ function init() {
                     scene.add( object );
                 } );
         */
-               
+        
+
+        //############ LADJA ############
+		var loader = new THREE.ObjectLoader();
+			loader.load( 'models/ladja2.json', 
+			function ( objectTmp) {
+				objectTmp.scale.x = objectTmp.scale.y = objectTmp.scale.z = 15.5;
+				objectTmp.position.y = water.position.y + Math.round(cube.geometry.parameters.height/2)-13;	//voda je na 250 torej more bit objekt na 250+polovica višine objekta
+				objectTmp.position.x = 250;
+				objectTmp.position.z = 24800;
+				camera.rotateOnAxis( new THREE.Vector3( 0, 1, 0 ), Math.PI / 2);
+				objectTmp.add(camera);
+				objectTmp.rotateOnAxis( new THREE.Vector3( 0, 1, 0 ), -Math.PI / 2);
+			    
+			    scene.add( objectTmp );
+			   	object = objectTmp;
+			} );
+
         //############ LADJA-KOCKA ############
         var geometryCube = new THREE.BoxGeometry(25, 25, 25);
-        var materialCube = new THREE.MeshBasicMaterial({color: 0xfffff});
+        //var materialCube = new THREE.MeshBasicMaterial({color: 0xfffff});
+        var materialCube = new THREE.MeshBasicMaterial({transparent: true, opacity: 0});
         cube = new THREE.Mesh(geometryCube, materialCube);
         //voda je na 250 torej more bit objekt na 250+polovica višine objekta
         cube.position.y = water.position.y + Math.round(cube.geometry.parameters.height/2);     
         cube.position.x = 250;
         cube.position.z = 24800;
-        cube.add(camera);
+        //cube.add(camera);
         scene.add(cube);
        
+
+       //############ LUČI ############
+       	var ambientLight = new THREE.AmbientLight(0x404040);
+		scene.add(ambientLight);
+
+		var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+		scene.add( light );
+
 
         //############ CILJ ############
 		var loader1 = new THREE.OBJLoader();
@@ -377,18 +415,6 @@ function init() {
         //console.log(allCoins);
        
  
-/*      //############ TESTNI OBJEKT############
-        var geometryCube = new THREE.BoxGeometry(25, 25, 25);
-        var materialCube = new THREE.MeshBasicMaterial({color: 0x343434});
-        cube1 = new Physijs.BoxMesh(geometryCube, materialCube);
-        //voda je na 250 torej more bit objekt na 250+polovica višine objekta
-        cube1.position.y = water.position.y + Math.round(cube.geometry.parameters.height/2);    
-        cube1.position.x = -50;
-        cube1.position.z = 3500;
-        scene.add(cube1);
-        allCrates.push(cube1);
-*/
- 
         //############ TEREN ############
         texture = new THREE.CanvasTexture( generateTexture( data, worldWidth, worldDepth ) );
         texture.wrapS = THREE.ClampToEdgeWrapping;
@@ -421,7 +447,7 @@ function init() {
  
 
         ///############ SCORE ############
-     	//document.getElementById("scoreDiv").innerHTML = score.toString();
+     	document.getElementById("scoreDiv").innerHTML = score.toString();
  
         window.addEventListener( 'resize', onWindowResize, false );
  
@@ -572,24 +598,29 @@ function render() {
             	if(objSpeed < -23)
                      objSpeed = -23;
             cube.translateZ(objSpeed);
+            object.translateX(objSpeed);
         }
  
         if(keyboard.pressed("left")) {
-                if(!started){
+                if(!started && !colided){
                     startClock();
                 }
                 // rotacija v levo
-                else
+                else{
                 	cube.rotateOnAxis( new THREE.Vector3( 0, 1, 0 ), rotateAngle);
+                	object.rotateOnAxis( new THREE.Vector3( 0, 1, 0 ), rotateAngle);
+                }
         }
  
         if(keyboard.pressed("right")) {
-                if(!started){
+                if(!started && !colided){
                     startClock();	
                 }
                 // rotacija v desno
-                else
-                    cube.rotateOnAxis( new THREE.Vector3( 0, 1, 0 ), -rotateAngle);	
+                else{
+                	cube.rotateOnAxis( new THREE.Vector3( 0, 1, 0 ), -rotateAngle);
+                	object.rotateOnAxis( new THREE.Vector3( 0, 1, 0 ), -rotateAngle);
+                }	
         }
  
         // space - reset scene 
@@ -605,49 +636,59 @@ function render() {
  
         // collision detection
         var originPoint = cube.position.clone();
-        for (var vertexIndex = 0; vertexIndex < cube.geometry.vertices.length; vertexIndex++){		
-			var localVertex = cube.geometry.vertices[vertexIndex].clone();
-			var globalVertex = localVertex.applyMatrix4( cube.matrix );
-			var directionVector = globalVertex.sub( cube.position );
-			var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
-			var collisionResultsCrate = ray.intersectObjects( allCrates );
-			var collisionResultsCoins = ray.intersectObjects( allCoins );
-			var collisionResultFinish = ray.intersectObjects(finishTmp);
+        if(!colided){
+	        for (var vertexIndex = 0; vertexIndex < cube.geometry.vertices.length; vertexIndex++){		
+				var localVertex = cube.geometry.vertices[vertexIndex].clone();
+				var globalVertex = localVertex.applyMatrix4( cube.matrix );
+				var directionVector = globalVertex.sub( cube.position );
+				var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
+				var collisionResultsCrate = ray.intersectObjects( allCrates );
+				var collisionResultsCoins = ray.intersectObjects( allCoins );
+				var collisionResultFinish = ray.intersectObjects(finishTmp);
 
 
-			//  škatlo
-			if (collisionResultsCrate.length > 0 && started) {
-				started = false;
-				colided = true; 
-				document.getElementById("gameOver").innerHTML = 'Too much rum mate? You\'ve collected '+score.toString()+' coins!';
-				break;
-			}
+				//  škatlo
+				if (collisionResultsCrate.length > 0 && started) {
+					var hit = new Audio('sounds/hit.mp3');
+					hit.play();
 
-			// finish
-			if (collisionResultFinish.length > 0 && started) {
-				started = false;
-				finished = true;
-				document.getElementById("gameOver").innerHTML = 'ARRRR YOU\'RE THE REAL PIRATE! You\'ve collected '+score.toString()+' coins!';
-				break;
-			}
-
-			//  žeton
-			if (collisionResultsCoins.length > 0 && collisionResultsCoins[0].distance < directionVector.length()) {
-				// find out which coin you collected and remove it from the scene & array				
-				for ( var i = 0; i < collisionResultsCoins.length; i++ ) {
-					allCoins.splice(i,1);
-					collisionResultsCoins[i].object.position.y = 0;
-					scoreCounter[collisionResultsCoins[i].object] = 1;
-					if(!scoreCounter){
-						score++;
-						scoreCounter = true;
-					}
-
+					started = false;
+					colided = true; 
+					document.getElementById("gameOver").innerHTML = 'Too much rum, mate? You\'ve collected '+score.toString()+' coins!';
 					break;
-				};
-				//score = calculateScore();
-				document.getElementById("scoreDiv").innerHTML = score.toString();
-			}	
+				}
+
+				// finish
+				if (collisionResultFinish.length > 0 && started) {
+					var konec = new Audio('sounds/konec.wav');
+					konec.play();
+
+					started = false;
+					finished = true;
+					document.getElementById("gameOver").innerHTML = 'ARRRR YOU\'RE THE REAL PIRATE! You\'ve collected '+score.toString()+' coins!';
+					break;
+				}
+
+				//  žeton
+				if (collisionResultsCoins.length > 0 && collisionResultsCoins[0].distance < directionVector.length()) {
+					var kovancek = new Audio('sounds/item1.wav');
+					kovancek.play();
+					// find out which coin you collected and remove it from the scene & array				
+					for ( var i = 0; i < collisionResultsCoins.length; i++ ) {
+						allCoins.splice(i,1);
+						collisionResultsCoins[i].object.position.y = 0;
+						scoreCounter[collisionResultsCoins[i].object] = 1;
+						if(!scoreCounter){
+							score++;
+							scoreCounter = true;
+						}
+
+						break;
+					};
+					//score = calculateScore();
+					document.getElementById("scoreDiv").innerHTML = score.toString();
+				}	
+			}
 		}
 		scoreCounter = false;      
        	rotateCoins();
