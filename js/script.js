@@ -26,6 +26,9 @@ var finishTmp = [];
 var collisionSpecCoin;
 var objSpeed;
 var scoreCounter = false;
+var maxScore = 0;
+var first;
+
 init();
 animate();
  
@@ -34,6 +37,7 @@ function init() {
         container = document.getElementById( 'container' );
         score = 0;
         objSpeed = -4;
+        maxScore = calculateMaxScore(maxScore,score);
  
         //camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
         camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 110000 );
@@ -280,57 +284,76 @@ function init() {
         geometryLine2.vertices = otocek1.getPoints( 50 );
         geometryLine3.vertices = otocek2.getPoints( 50 );
  
-        var materialLine = new THREE.LineBasicMaterial( { color : 0xf32530 } );
+        var materialLine = new THREE.LineBasicMaterial( {} );
  
         //Create the final Object3d to add to the scene
         var splineObject = new THREE.Line( geometryLine, materialLine );
         var splineObject2 = new THREE.Line( geometryLine2, materialLine );
         var splineObject3 = new THREE.Line( geometryLine3, materialLine );
-        scene.add(splineObject);
-        scene.add(splineObject2);
-        scene.add(splineObject3);
+        // scene.add(splineObject);
+        // scene.add(splineObject2);
+        // scene.add(splineObject3);
         allCrates.push(splineObject);
         allCrates.push(splineObject2);
         allCrates.push(splineObject3);
 
  
         //############ OVIRE ############
-        createObstacle(230, 24200);
-        createObstacle(150, 22200);
-        createObstacle(50, 21200);
-        createObstacle(80, 20200);
-        createObstacle(100, 19200);
-        createObstacle(30, 18200);
-        createObstacle(80, 17200);
-        createObstacle(80, 14200);
-        createObstacle(80, 13200);
-        createObstacle(-70, 11200);
-        createObstacle(-110, 9800);
-        createObstacle(-130, 8200);
-        createObstacle(-150, 7200);
-        createObstacle(0, 7200);
-        createObstacle(-200, 7800);
-        createObstacle(-10, 6800);
-        createObstacle(-250, 6800);
-        createObstacle(50, 6400);
-        createObstacle(-30, 5700);
-        createObstacle(-50, 3500);
-        createObstacle(-100, 3000);
-        createObstacle(-20, 1200);
-        createObstacle(-60, 100);
-        createObstacle(0, -1000);
-        createObstacle(100, -2300);
- 
-        //createObstacle(80, 20200);
-        //createObstacle(100, 19200);
-        //createObstacle(30, 18200);
-        //createObstacle(80, 17200);
-        //createObstacle(80, 14200);
-        //createObstacle(80, 13200);
-        //createObstacle(-70, 11200);
-        //createObstacle(-110, 9800);
-        //createObstacle(-130, 8200);
-
+		createObstacle(230, 24200);
+		createObstacle(150, 22200);
+		createObstacle(50, 21200);
+		createObstacle(80, 20200);
+		createObstacle(100, 19200);
+		createObstacle(30, 18200);
+		createObstacle(80, 17200);
+		createObstacle(80, 14200);
+		createObstacle(80, 13200);
+		createObstacle(-70, 11200);
+		createObstacle(-110, 9800);
+		createObstacle(-130, 8200);
+		createObstacle(-150, 7200);
+		createObstacle(0, 7200);
+		createObstacle(-200, 7800);
+		createObstacle(-10, 6800);
+		createObstacle(-250, 6800);
+		createObstacle(50, 6400);
+		createObstacle(-30, 5700);
+		createObstacle(-50, 3500);
+		createObstacle(-100, 3000);
+		createObstacle(-20, 1200);
+		createObstacle(-60, 100);
+		createObstacle(0, -1000);
+		createObstacle(100, -2300);
+		createObstacle(70, -3500);
+		createObstacle(200, -4800);
+		createObstacle(210, -5300);
+		createObstacle(100, -6400);
+		createObstacle(350, -7700);
+		createObstacle(350, -9000);
+		createObstacle(450, -9010);
+		createObstacle(400, -10000);
+		createObstacle(500, -11000);
+		createObstacle(445, -12300);
+		createObstacle(520, -13700);
+		createObstacle(520, -14300);
+		createObstacle(400, -15200);
+		createObstacle(450, -16400);
+		createObstacle(350, -17000);
+		createObstacle(430, -17700);
+		createObstacle(196, -6820);
+		createObstacle(120, -7200);
+		createObstacle(70, -8300);
+		createObstacle(40, -9200);
+		createObstacle(-30, -10700);
+		createObstacle(10, -11200);
+		createObstacle(-70, -12100);
+		createObstacle(-20, -13000);
+		createObstacle(-60, -14100);
+		createObstacle(30, -15000);
+		createObstacle(10, -16200);
+		createObstacle(20, -16900);
+		createObstacle(90, -17500);
+		createObstacle(70, -18100);
  
         
         //############ ZETONI ############
@@ -382,18 +405,23 @@ function init() {
         renderer.setSize( window.innerWidth, window.innerHeight );
         container.innerHTML = "";
         container.appendChild( renderer.domElement );
- 
 
         //############ STATS ############
-        stats = new Stats();
-        stats.domElement.style.position = 'absolute';
-        stats.domElement.style.top = '0px';
-        container.appendChild( stats.domElement );
+        // stats = new Stats();
+        // stats.domElement.style.position = 'absolute';
+        // stats.domElement.style.top = '0px';
+        // container.appendChild( stats.domElement );
+
+        first = document.createElement("div");
+		first.id="first1";
+		first.className="first";
+		//first.style.backgroundImage = "url('textures/startLogo.png')";
+		var container = document.getElementById("container");
+		container.appendChild(first);
  
 
         ///############ SCORE ############
-     	document.getElementById("scoreDiv").innerHTML = score.toString();
-
+     	//document.getElementById("scoreDiv").innerHTML = score.toString();
  
         window.addEventListener( 'resize', onWindowResize, false );
  
@@ -487,9 +515,9 @@ function generateTexture( data, width, height ) {
  
                 shade = vector3.dot( sun );
  
-                imageData[ i ] = ( 32 + shade * 76 ) * ( 0.5 + data[ j ] * 0.007 );
-                imageData[ i + 1 ] = ( 32 + shade * 66 ) * ( 0.5 + data[ j ] * 0.007 );
-                imageData[ i + 2 ] = ( shade * 22 ) * ( 0.5 + data[ j ] * 0.003 );
+                imageData[ i ] = ( 20 + shade * 80 ) * ( 0.5 + data[ j ] * 0.007 );
+                imageData[ i + 1 ] = ( 20 + shade * 80 ) * ( 0.5 + data[ j ] * 0.007 );
+                imageData[ i + 2 ] = ( shade * 80 ) * ( 0.5 + data[ j ] * 0.003 );
         }
  
         context.putImageData( image, 0, 0 );
@@ -524,7 +552,7 @@ function animate() {
         // scene.simulate();
         render();
         requestAnimationFrame( animate );
-        stats.update();
+        //stats.update();
 }
  
  // ########## RENDER ##########
@@ -547,16 +575,18 @@ function render() {
         }
  
         if(keyboard.pressed("left")) {
-                if(!started)
+                if(!started){
                     startClock();
+                }
                 // rotacija v levo
                 else
                 	cube.rotateOnAxis( new THREE.Vector3( 0, 1, 0 ), rotateAngle);
         }
  
         if(keyboard.pressed("right")) {
-                if(!started)
+                if(!started){
                     startClock();	
+                }
                 // rotacija v desno
                 else
                     cube.rotateOnAxis( new THREE.Vector3( 0, 1, 0 ), -rotateAngle);	
@@ -568,7 +598,6 @@ function render() {
                 started = false;
                 colided = false;
                 finished = false;
-                scoreCounter = false;
                 score = 0;
                 document.getElementById("gameOver").innerHTML = "";
         }
@@ -587,15 +616,15 @@ function render() {
 
 
 			//  škatlo
-			if ( collisionResultsCrate.length > 0 && started) {
+			if (collisionResultsCrate.length > 0 && started) {
 				started = false;
-				colided = true;
+				colided = true; 
 				document.getElementById("gameOver").innerHTML = 'Too much rum mate? You\'ve collected '+score.toString()+' coins!';
 				break;
 			}
 
 			// finish
-			if ( collisionResultFinish.length > 0 && started) {
+			if (collisionResultFinish.length > 0 && started) {
 				started = false;
 				finished = true;
 				document.getElementById("gameOver").innerHTML = 'ARRRR YOU\'RE THE REAL PIRATE! You\'ve collected '+score.toString()+' coins!';
@@ -603,7 +632,7 @@ function render() {
 			}
 
 			//  žeton
-			if ( collisionResultsCoins.length > 0 && collisionResultsCoins[0].distance < directionVector.length()) {
+			if (collisionResultsCoins.length > 0 && collisionResultsCoins[0].distance < directionVector.length()) {
 				// find out which coin you collected and remove it from the scene & array				
 				for ( var i = 0; i < collisionResultsCoins.length; i++ ) {
 					allCoins.splice(i,1);
@@ -646,4 +675,9 @@ function calculateScore(){
 		tmpScore += el;
 	}
 	return tmpScore;
+}
+
+function calculateMaxScore(max, score){
+	return Math.max(this.max, this.score);
+
 }
