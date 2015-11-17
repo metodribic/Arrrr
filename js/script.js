@@ -25,6 +25,7 @@ var finished = true;
 var finishTmp = [];
 var collisionSpecCoin;
 var objSpeed;
+var scoreCounter = false;
 init();
 animate();
  
@@ -32,20 +33,11 @@ animate();
 function init() {
         container = document.getElementById( 'container' );
         score = 0;
-        objSpeed = 0;
+        objSpeed = -4;
  
         //camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
         camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 110000 );
         scene = new THREE.Scene();
-        // scene.addEventListener(
-        //                 'update',
-        //                 function() {
-        //                         console.log("bam");
-        //                         scene.simulate( undefined, 1 );
-        //                         physics_stats.update();
-                               
-        //                 }
-        //         );
         data = generateHeight( worldWidth, worldDepth );
  
         //camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
@@ -139,7 +131,6 @@ function init() {
        
 
         //############ CILJ ############
-        // instantiate a loader
 		var loader1 = new THREE.OBJLoader();
 
 		// // load a resource
@@ -157,12 +148,12 @@ function init() {
         var geometryCube1 = new THREE.BoxGeometry(25, 25, 25);
         var materialCube1 = new THREE.MeshBasicMaterial({color: 0xffd700});
         finish = new THREE.Mesh(geometryCube1, materialCube1);
-        //voda je na 250 torej more bit objekt na 250+polovica višine objekta
         finish.position.y = water.position.y + Math.round(finish.geometry.parameters.height/2);     
         finish.position.x = 250;
         finish.position.z = -19000;
         finishTmp.push(finish);
         scene.add(finish);
+
        
 		//############ TEREN-COLLISION ############
         var y = water.position.y + Math.round(cube.geometry.parameters.height/2);
@@ -256,8 +247,6 @@ function init() {
                 new THREE.Vector3(26, y, 18487 )
         ]);   
  
-       
- 
         var otocek2 = new THREE.SplineCurve3( [
                 new THREE.Vector3(224, y, -7406 ),
                 new THREE.Vector3(287, y, -8232 ),
@@ -342,8 +331,6 @@ function init() {
         //createObstacle(-110, 9800);
         //createObstacle(-130, 8200);
 
-
- 
  
         
         //############ ZETONI ############
@@ -540,7 +527,7 @@ function animate() {
         stats.update();
 }
  
- 
+ // ########## RENDER ##########
 function render() {
  
         var delta = clock.getDelta();
@@ -549,9 +536,6 @@ function render() {
         // objSpeed = -moveDistance*clock.elapsedTime*15;
         var elapsed = Math.floor(clock.elapsedTime);
 
-        rotateCoins();
-
- 
         // če je igra v teku, povečaj hitrost oziroma se premakni za večji vektor
         if(started){
             // vsako sekundo prištej hitrost za 0.025
@@ -584,6 +568,7 @@ function render() {
                 started = false;
                 colided = false;
                 finished = false;
+                scoreCounter = false;
                 score = 0;
                 document.getElementById("gameOver").innerHTML = "";
         }
@@ -612,24 +597,31 @@ function render() {
 			// finish
 			if ( collisionResultFinish.length > 0 && started) {
 				started = false;
-				finished = true;;
+				finished = true;
 				document.getElementById("gameOver").innerHTML = 'ARRRR YOU\'RE THE REAL PIRATE! You\'ve collected '+score.toString()+' coins!';
 				break;
 			}
 
 			//  žeton
 			if ( collisionResultsCoins.length > 0 && collisionResultsCoins[0].distance < directionVector.length()) {
-				// find out which coin you collected and remove it from the scene & array
+				// find out which coin you collected and remove it from the scene & array				
 				for ( var i = 0; i < collisionResultsCoins.length; i++ ) {
 					allCoins.splice(i,1);
 					collisionResultsCoins[i].object.position.y = 0;
-					score++;
+					scoreCounter[collisionResultsCoins[i].object] = 1;
+					if(!scoreCounter){
+						score++;
+						scoreCounter = true;
+					}
+
 					break;
 				};
+				//score = calculateScore();
 				document.getElementById("scoreDiv").innerHTML = score.toString();
 			}	
-		}      
-       
+		}
+		scoreCounter = false;      
+       	rotateCoins();
         renderer.render( scene, camera );
 }
  
@@ -646,4 +638,12 @@ function rotateCoins(){
 		coin1.rotation.x += 0.1;
         coin1.rotation.z += 0.13;
 	}
+}
+
+function calculateScore(){
+	var tmpScore = 0; 
+	for (el of scoreCounter) {
+		tmpScore += el;
+	}
+	return tmpScore;
 }
