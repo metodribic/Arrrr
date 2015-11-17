@@ -233,6 +233,7 @@ function init() {
                 new THREE.Vector3(-19, y, 9597 ),
                 new THREE.Vector3(-18, y, 8562 ),
                 new THREE.Vector3(4, y, 7206 ),
+                new THREE.Vector3(-10, y, 6500 ),
                 new THREE.Vector3(41, y, 6958 ),
                 new THREE.Vector3(192, y, 5188 ),
                 new THREE.Vector3(-3, y, 3944 ),
