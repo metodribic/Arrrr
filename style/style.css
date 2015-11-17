@@ -28,3 +28,23 @@ a {
   padding:0;
   opacity: .75;
 }
+
+#scoreDiv{
+	z-index: 99;
+	position: absolute;
+    top: 0px;
+    right: 0px;
+    font-size: 100px;
+    height: 100px;
+    width:100px;
+    color: #ffffff;
+}
+
+#gameOver{
+	z-index: 100;
+	position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: 50px;
+    color: #ffffff;
+}
