@@ -48,6 +48,7 @@ function init() {
         container = document.getElementById( 'container' );
         score = 0;
         objSpeed = -4;
+        allCoins = [];
         console.log(maxScore);
         console.log(score);
 
@@ -177,30 +178,30 @@ function init() {
 		scene.add( light );
 
 
-        //############ CILJ ############
+        //############ createCilj ############
 		
         //levi stolp
-        cilj(140, 360, -19030);
-        cilj(140, 385, -19030);
-        cilj(140, 405, -19030);
-        cilj(140, 430, -19030);
-        cilj(140, 455, -19030);
-        cilj(140, 480, -19030);
+        createCilj(140, 360, -19030);
+        createCilj(140, 385, -19030);
+        createCilj(140, 405, -19030);
+        createCilj(140, 430, -19030);
+        createCilj(140, 455, -19030);
+        createCilj(140, 480, -19030);
         //desni stolp
-        cilj(340, 360, -19030);
-        cilj(340, 385, -19030);
-        cilj(340, 405, -19030);
-        cilj(340, 430, -19030);
-        cilj(340, 455, -19030);
-        cilj(340, 480, -19030);
+        createCilj(340, 360, -19030);
+        createCilj(340, 385, -19030);
+        createCilj(340, 405, -19030);
+        createCilj(340, 430, -19030);
+        createCilj(340, 455, -19030);
+        createCilj(340, 480, -19030);
         //povezava
-        cilj(165, 480, -19030);
-        cilj(190, 480, -19030);
-        cilj(215, 480, -19030);
-        cilj(240, 480, -19030);
-        cilj(265, 480, -19030);
-        cilj(290, 480, -19030);
-        cilj(315, 480, -19030);
+        createCilj(165, 480, -19030);
+        createCilj(190, 480, -19030);
+        createCilj(215, 480, -19030);
+        createCilj(240, 480, -19030);
+        createCilj(265, 480, -19030);
+        createCilj(290, 480, -19030);
+        createCilj(315, 480, -19030);
 
         var geometryCube1 = new THREE.BoxGeometry(25, 25, 25);
         var materialCube1 = new THREE.MeshBasicMaterial({color: 0xffd700});
@@ -595,7 +596,7 @@ function generateTexture( data, width, height ) {
 }
 
 //kreiranje ovir-SKATLE //
-function cilj(ox, oy, oz) {
+function createCilj(ox, oy, oz) {
         var crateTexture = new THREE.ImageUtils.loadTexture('textures/crate.jpg');
         var crateMaterial = new THREE.MeshBasicMaterial( { map: crateTexture } );
         var crateGeometry = new THREE.CubeGeometry(25, 25, 25, 1, 1, 1);
