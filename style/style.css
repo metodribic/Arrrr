@@ -47,6 +47,18 @@ a {
     font-size: 50px;
     color: #ffffff;
 }
+
+#maxScore{
+	z-index: 98;
+	position: absolute;
+    top: 0;
+    left: 80%;
+    margin-top: 4%;
+    font-size: 20px;
+    height: 100px;
+    width:200px;
+    color: #ffffff;
+}
 /*
 .first {
 	z-index: 101;

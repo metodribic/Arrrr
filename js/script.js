@@ -18,6 +18,7 @@ var allCrates = []; //tabela v katero shranis vse objekte, za collision
 var allCoins = []; //tabela kovanckov
 var started = false;
 var score = 0;
+var maxScore = 0;
 var divScore;
 var cube1;
 var colided = false;
@@ -26,7 +27,6 @@ var finishTmp = [];
 var collisionSpecCoin;
 var objSpeed;
 var scoreCounter = false;
-var maxScore = 0;
 var first;
 
 init();
@@ -48,11 +48,16 @@ function init() {
         container = document.getElementById( 'container' );
         score = 0;
         objSpeed = -4;
+        console.log(maxScore);
+        console.log(score);
+
         maxScore = calculateMaxScore(maxScore,score);
+
  
         //camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
         camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 110000 );
         scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2( 0xefd1b5, 0.0125 );
         data = generateHeight( worldWidth, worldDepth );
  
         //camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
@@ -173,20 +178,30 @@ function init() {
 
 
         //############ CILJ ############
-		var loader1 = new THREE.OBJLoader();
+		
+        //levi stolp
+        cilj(140, 360, -19030);
+        cilj(140, 385, -19030);
+        cilj(140, 405, -19030);
+        cilj(140, 430, -19030);
+        cilj(140, 455, -19030);
+        cilj(140, 480, -19030);
+        //desni stolp
+        cilj(340, 360, -19030);
+        cilj(340, 385, -19030);
+        cilj(340, 405, -19030);
+        cilj(340, 430, -19030);
+        cilj(340, 455, -19030);
+        cilj(340, 480, -19030);
+        //povezava
+        cilj(165, 480, -19030);
+        cilj(190, 480, -19030);
+        cilj(215, 480, -19030);
+        cilj(240, 480, -19030);
+        cilj(265, 480, -19030);
+        cilj(290, 480, -19030);
+        cilj(315, 480, -19030);
 
-		// // load a resource
-		// loader1.load(
-		// 	// resource URL
-		// 	'models/chest.obj',
-		// 	// Function when resource is loaded
-		// 	function ( chest ) {
-		// 		chest.position.y = water.position.y + 200     
-		//         chest.position.x = 250;
-		//         chest.position.z = -19000;
-		// 		scene.add( chest );
-		// 	}
-		// );
         var geometryCube1 = new THREE.BoxGeometry(25, 25, 25);
         var materialCube1 = new THREE.MeshBasicMaterial({color: 0xffd700});
         finish = new THREE.Mesh(geometryCube1, materialCube1);
@@ -412,14 +427,20 @@ function init() {
         coin.position.z = 24250;
         allCoins.push(coin);
         scene.add( coin );
-        //console.log(allCoins);
+
+
+        var sphereGeometry = new THREE.SphereGeometry( 8, 8, 16 ); 
+		var sphereMaterial = new THREE.MeshLambertMaterial( {transparent: true, opacity: 0} ); 
+		var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+		sphere.position.set(250,  coin.position.y, 24250);
+		scene.add(sphere);
        
  
         //############ TEREN ############
         texture = new THREE.CanvasTexture( generateTexture( data, worldWidth, worldDepth ) );
         texture.wrapS = THREE.ClampToEdgeWrapping;
         texture.wrapT = THREE.ClampToEdgeWrapping;
-        mesh = new Physijs.BoxMesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
+        mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
         scene.add( mesh );
         //allCrates.push(mesh);
  
@@ -448,6 +469,7 @@ function init() {
 
         ///############ SCORE ############
      	document.getElementById("scoreDiv").innerHTML = score.toString();
+     	document.getElementById("maxScore").innerHTML = 'highScore: '+maxScore.toString();
  
         window.addEventListener( 'resize', onWindowResize, false );
  
@@ -571,6 +593,20 @@ function generateTexture( data, width, height ) {
  
         return canvasScaled;
 }
+
+//kreiranje ovir-SKATLE //
+function cilj(ox, oy, oz) {
+        var crateTexture = new THREE.ImageUtils.loadTexture('textures/crate.jpg');
+        var crateMaterial = new THREE.MeshBasicMaterial( { map: crateTexture } );
+        var crateGeometry = new THREE.CubeGeometry(25, 25, 25, 1, 1, 1);
+        crate = new THREE.Mesh(crateGeometry, crateMaterial);
+        //voda je na 250 torej more bit objekt na 250+polovica višine objekta
+        crate.position.y = oy;    
+        crate.position.x = ox;
+        crate.position.z = oz;
+        scene.add( crate );
+        return crate;
+}
  
  
 
@@ -655,6 +691,8 @@ function render() {
 					started = false;
 					colided = true; 
 					document.getElementById("gameOver").innerHTML = 'Too much rum, mate? You\'ve collected '+score.toString()+' coins!';
+					maxScore = calculateMaxScore(maxScore,score);
+					document.getElementById("maxScore").innerHTML = 'highScore: '+maxScore.toString();
 					break;
 				}
 
@@ -666,6 +704,8 @@ function render() {
 					started = false;
 					finished = true;
 					document.getElementById("gameOver").innerHTML = 'ARRRR YOU\'RE THE REAL PIRATE! You\'ve collected '+score.toString()+' coins!';
+					maxScore = calculateMaxScore(maxScore,score);
+					document.getElementById("maxScore").innerHTML = 'highScore: '+maxScore.toString();
 					break;
 				}
 
@@ -718,7 +758,9 @@ function calculateScore(){
 	return tmpScore;
 }
 
-function calculateMaxScore(max, score){
-	return Math.max(this.max, this.score);
+function calculateMaxScore(max, score1){
+	var pes = Math.max(max, score1);
+	console.log(pes);
+	return pes
 
 }
