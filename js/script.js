@@ -22,7 +22,9 @@ var divScore;
 var cube1;
 var colided = false;
 var finished = true;
- 
+var finishTmp = [];
+var collisionSpecCoin;
+var objSpeed;
 init();
 animate();
  
@@ -30,6 +32,7 @@ animate();
 function init() {
         container = document.getElementById( 'container' );
         score = 0;
+        objSpeed = 0;
  
         //camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
         camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 110000 );
@@ -158,6 +161,7 @@ function init() {
         finish.position.y = water.position.y + Math.round(finish.geometry.parameters.height/2);     
         finish.position.x = 250;
         finish.position.z = -19000;
+        finishTmp.push(finish);
         scene.add(finish);
        
 		//############ TEREN-COLLISION ############
@@ -245,12 +249,12 @@ function init() {
                 new THREE.Vector3(122, y, 23374 ),
                 new THREE.Vector3(160, y, 24383 ),
                 new THREE.Vector3(197, y, 25000 )              
-        ] );
+        ]);
  
         var otocek1 = new THREE.SplineCurve3( [
                 new THREE.Vector3(32, y, 18855 ),
                 new THREE.Vector3(26, y, 18487 )
-        ] );   
+        ]);   
  
        
  
@@ -275,7 +279,7 @@ function init() {
                 new THREE.Vector3(133, y, -7951 ),
                 new THREE.Vector3(200, y, -7526 ),
                 new THREE.Vector3(216, y, -7391 )
-        ] );   
+        ]);   
  
  
  
@@ -542,40 +546,39 @@ function render() {
         var delta = clock.getDelta();
         var moveDistance = 20 * delta;
         var rotateAngle = Math.PI / 6 * delta;
-        var objSpeed = -moveDistance*clock.elapsedTime*15;
+        // objSpeed = -moveDistance*clock.elapsedTime*15;
+        var elapsed = Math.floor(clock.elapsedTime);
 
         rotateCoins();
 
  
         // če je igra v teku, povečaj hitrost oziroma se premakni za večji vektor
         if(started){
-                if(objSpeed < -23)
-                        objSpeed = -23;
-                //object.translateZ(objSpeed);
-                cube.translateZ(objSpeed);
+            // vsako sekundo prištej hitrost za 0.025
+            if(elapsed % 2 == 1)
+            	objSpeed -= 0.025;
+            	if(objSpeed < -23)
+                     objSpeed = -23;
+            cube.translateZ(objSpeed);
         }
  
         if(keyboard.pressed("left")) {
-                // start
                 if(!started)
-                        startClock();
+                    startClock();
                 // rotacija v levo
                 else
-                //object.rotateOnAxis( new THREE.Vector3( 0, 1, 0 ), rotateAngle);
-                cube.rotateOnAxis( new THREE.Vector3( 0, 1, 0 ), rotateAngle);
+                	cube.rotateOnAxis( new THREE.Vector3( 0, 1, 0 ), rotateAngle);
         }
  
         if(keyboard.pressed("right")) {
-                // start
                 if(!started)
-                        startClock();
+                    startClock();	
                 // rotacija v desno
                 else
-                        //object.rotateOnAxis( new THREE.Vector3( 0, 1, 0 ), -rotateAngle);
-                        cube.rotateOnAxis( new THREE.Vector3( 0, 1, 0 ), -rotateAngle);
+                    cube.rotateOnAxis( new THREE.Vector3( 0, 1, 0 ), -rotateAngle);	
         }
  
-        // space pritisnemo ko se igra že izvaja - igro ustavimo, ter ponovno izrišemo > resetiramo položaj
+        // space - reset scene 
         if(keyboard.pressed("space")) {
                 init();
                 started = false;
@@ -588,47 +591,46 @@ function render() {
  
         // collision detection
         var originPoint = cube.position.clone();
-        var tmpIndex = 0;
         for (var vertexIndex = 0; vertexIndex < cube.geometry.vertices.length; vertexIndex++){		
 			var localVertex = cube.geometry.vertices[vertexIndex].clone();
 			var globalVertex = localVertex.applyMatrix4( cube.matrix );
 			var directionVector = globalVertex.sub( cube.position );
-			
 			var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
 			var collisionResultsCrate = ray.intersectObjects( allCrates );
-			//var ray2 = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
 			var collisionResultsCoins = ray.intersectObjects( allCoins );
-			//var collisionFinish = ray.intersectObjects(finish[0]);
+			var collisionResultFinish = ray.intersectObjects(finishTmp);
 
 
-			// zadanem škatlo
-			// if ( collisionResultsCrate.length > 0 && collisionResultsCrate[0].distance < directionVector.length() && started) {
+			//  škatlo
 			if ( collisionResultsCrate.length > 0 && started) {
 				started = false;
 				colided = true;
-				document.getElementById("gameOver").innerHTML = 'ARRRR YOU SUCK! You\'ve collected '+score.toString()+' coins!';
+				document.getElementById("gameOver").innerHTML = 'Too much rum mate? You\'ve collected '+score.toString()+' coins!';
+				break;
 			}
 
 			// finish
-			// if ( collisionResultsCrate.length > 0 && started) {
-			// 	started = false;
-			// 	finished = true;;
-			// 	document.getElementById("gameOver").innerHTML = 'ARRRR YOU\'RE THE REAL PIRATE! You\'ve collected '+score.toString()+' coins!';
-			// }
+			if ( collisionResultFinish.length > 0 && started) {
+				started = false;
+				finished = true;;
+				document.getElementById("gameOver").innerHTML = 'ARRRR YOU\'RE THE REAL PIRATE! You\'ve collected '+score.toString()+' coins!';
+				break;
+			}
 
-			// zadanem žeton
-			//if ( collisionResultsCoins.length > 0 && collisionResultsCoins[0].distance < directionVector.length() ) {
-			if ( collisionResultsCoins.length > 0) {
-				console.log("kovanc ++++++++++++++")
-				tmpIndex = vertexIndex
-				score++;
+			//  žeton
+			if ( collisionResultsCoins.length > 0 && collisionResultsCoins[0].distance < directionVector.length()) {
+				// find out which coin you collected and remove it from the scene & array
+				for ( var i = 0; i < collisionResultsCoins.length; i++ ) {
+					allCoins.splice(i,1);
+					collisionResultsCoins[i].object.position.y = 0;
+					score++;
+					break;
+				};
 				document.getElementById("scoreDiv").innerHTML = score.toString();
 			}	
 		}      
        
-       
         renderer.render( scene, camera );
- 
 }
  
  
