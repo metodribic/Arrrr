@@ -8,11 +8,7 @@ Product for Computer graphic and theory of games lecture in Faculty of computer 
 Arrrr is ready to play right away, no need to instaling anything.
 
 
-Athors:
+Authors:
 
-Programmers:
  * Jernej Koželj
  * Metod Ribič
-Designers:
- * Rok Kompare
- * Barbara Naglič
