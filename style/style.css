@@ -59,51 +59,15 @@ a {
     width:200px;
     color: #ffffff;
 }
-/*
-.first {
-	z-index: 101;
-	position: absolute;
-	width: 1000px;
-	height: 300px;
-    top: 20%;
-    left: 20%;
-    text-align: center;
-    background-image: url("../textures/startLogo.png"); 
-    animation: fadein 2s;
-    -moz-animation: fadein 2s; 
-    -webkit-animation: fadein 2s; 
-    -o-animation: fadein 2s; 
+
+#instructions{
+    z-index: 97;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin-top: 2%;
+    font-size: 20px;
+    height: 100px;
+    width:200px;
+    color: #ffffff;
 }
-@keyframes fadein {
-    from {
-        opacity:0;
-    }
-    to {
-        opacity:1;
-    }
-}
-@-moz-keyframes fadein { 
-    from {
-        opacity:0;
-    }
-    to {
-        opacity:1;
-    }
-}
-@-webkit-keyframes fadein { 
-    from {
-        opacity:0;
-    }
-    to {
-        opacity:1;
-    }
-}
-@-o-keyframes fadein { 
-    from {
-        opacity:0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-+?
